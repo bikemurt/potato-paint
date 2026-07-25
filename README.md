@@ -13,3 +13,21 @@ Potato Paint is a lightweight, optimized, cross-platform painting application. I
 - Optimized C++ paint brush code (made with GDextension)
 - Saving/loading projects
 - Bucket fill
+
+## Emoji Legend
+- ↩️ Undo
+- 🔁 Redo
+- 🔨 Toolbox
+- ⚙️ Brush settings
+- 💾 Save
+- 🔍 Load
+- 🧹 Eraser
+- 👀 Hide UI (top the semi-transparent white square in top left to bring the UI back)
+- 🖌️ Color picker (eyedropper tool)
+- 🪣 Bucket fill with current color
+- 🪟 Clear the entire layer to transparent
+- ⬅️ Move layer left
+- ⬅️ Move layer right
+- ➕ New layer
+- 👁️ Toggle hide layer
+- ❌ Delete layer
