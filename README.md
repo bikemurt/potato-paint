@@ -37,4 +37,4 @@ Grab the builds from here: https://michaeljared.itch.io/potato-paint
 - ➕ New layer
 - 👁️ Toggle hide layer
 - ❌ Delete layer
-- 📤 Export rasterized image (this has a lot of limitations currently)
+- 📤 Export rasterized image
