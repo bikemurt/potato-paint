@@ -614,8 +614,6 @@ func _on_fill_button_pressed() -> void:
 
 func _on_set_eraser_button_pressed() -> void:
 	eraser = not eraser
-	if eraser: set_eraser_button.text = "E*"
-	else: set_eraser_button.text = "E"
 
 func _on_fill_empty_button_pressed() -> void:
 	save_undo_state()
