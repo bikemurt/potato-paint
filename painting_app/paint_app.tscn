@@ -3,6 +3,30 @@
 [ext_resource type="Script" uid="uid://v45f72auagv1" path="res://painting_app/paint_app.gd" id="1_xw4n4"]
 [ext_resource type="Texture2D" uid="uid://chqsonketj26f" path="res://painting_app/grid.png" id="2_2h5ql"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_csr3e"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.23137255, 0.23137255, 0.23137255, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_43u8t"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.23031491, 0.23031494, 0.23031494, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+corner_detail = 5
+
 [node name="PaintApp" type="Control" unique_id=754417124]
 layout_mode = 3
 anchors_preset = 0
@@ -310,6 +334,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_csr3e")
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UIParent/UI/SelectColor" unique_id=1847793652]
 layout_mode = 2
@@ -324,7 +349,6 @@ size_flags_vertical = 4
 unique_name_in_owner = true
 layout_mode = 2
 color_mode = 1
-sampler_visible = false
 color_modes_visible = false
 hex_visible = false
 
@@ -340,6 +364,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_43u8t")
 
 [node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/UIParent/UI/LoadFile" unique_id=717732678]
 layout_mode = 2
@@ -360,13 +385,22 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
-[node name="DeleteButton" type="Button" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer" unique_id=394842253]
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer" unique_id=1531223466]
 layout_mode = 2
-text = "❌ Delete File"
+size_flags_horizontal = 4
 
-[node name="NewFileButton" type="Button" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer" unique_id=1124190904]
+[node name="DeleteButton" type="Button" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=394842253]
 layout_mode = 2
-text = "📄 New File"
+text = "❌ Delete Current File"
+
+[node name="NewFileButton" type="Button" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1124190904]
+layout_mode = 2
+text = "📄 Start New File"
+
+[node name="Label" type="Label" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer" unique_id=365540761]
+layout_mode = 2
+text = "Load Other File:"
+horizontal_alignment = 1
 
 [node name="FileScrollContainer" type="ScrollContainer" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer" unique_id=884594104]
 unique_name_in_owner = true
@@ -378,6 +412,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_vertical = 3
+theme_override_constants/separation = 10
 
 [node name="Button" type="Button" parent="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/FileScrollContainer/LoadVBoxContainer" unique_id=143161439]
 layout_mode = 2
@@ -470,6 +505,6 @@ text = "Close"
 [connection signal="color_changed" from="CanvasLayer/UIParent/UI/SelectColor/MarginContainer/VBoxContainer/ColorPicker" to="." method="_on_color_picker_color_changed"]
 [connection signal="pressed" from="CanvasLayer/UIParent/UI/SelectColor/MarginContainer/VBoxContainer/ColorCloseButton" to="." method="_on_color_close_button_pressed"]
 [connection signal="text_changed" from="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer/FileNameLineEdit" to="." method="_on_file_name_line_edit_text_changed"]
-[connection signal="pressed" from="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer/DeleteButton" to="." method="_on_delete_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer/NewFileButton" to="." method="_on_new_file_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2/DeleteButton" to="." method="_on_delete_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2/NewFileButton" to="." method="_on_new_file_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/LoadFileCloseButton" to="." method="_on_load_file_close_button_pressed"]

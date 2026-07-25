@@ -671,6 +671,7 @@ func _on_load_button_pressed() -> void:
 	for save_file: int in save_data.files:
 		var save_file_data: Dictionary = save_data.files[save_file]
 		var button := Button.new()
+		button.custom_minimum_size.x = 300
 		button.text = get_file_name(save_file_data.file_name, save_file)
 		button.pressed.connect(func() -> void:
 			save_data.current_file = save_file
