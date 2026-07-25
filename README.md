@@ -18,6 +18,7 @@ Grab the builds from here: https://michaeljared.itch.io/potato-paint
 - Saving/loading projects
 - Bucket fill
 - Pen pressure (in theory, never tested)
+- Auto-saving
 
 ## Emoji Legend
 - ↩️ Undo
