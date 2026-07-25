@@ -150,7 +150,7 @@ text = "⚙️"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=700036048]
 layout_mode = 2
-size_flags_horizontal = 6
+size_flags_horizontal = 3
 
 [node name="UndoButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer" unique_id=66169369]
 layout_mode = 2
@@ -167,6 +167,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 4
 min_value = 1.0
 value = 1.0
