@@ -14,7 +14,7 @@ config/name="Potato Paint"
 run/main_scene="uid://j5hn67tvlksb"
 config/features=PackedStringArray("4.6", "Mobile")
 boot_splash/image="uid://cglqx0ocw0abn"
-config/icon="uid://cglqx0ocw0abn"
+config/icon="uid://bqrrwabx01uv0"
 
 [display]
 
