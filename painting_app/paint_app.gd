@@ -123,9 +123,6 @@ func _ready() -> void:
 	draw_region.gui_input.connect(gui_input)
 	full_draw_region.gui_input.connect(gui_input)
 	
-	get_window().size_changed.connect(window_size_changed)
-	window_size_changed()
-	
 	add_child(file_dialog)
 
 	file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
@@ -144,12 +141,6 @@ func _process(_delta: float) -> void:
 		var active_data := get_active_data()
 		active_data.image_texture.update(active_data.image)
 		texture_dirty = false
-
-func window_size_changed() -> void:
-	if DisplayServer.window_get_size().x < 1000:
-		get_tree().root.content_scale_factor = 0.8
-	else:
-		get_tree().root.content_scale_factor = 1.0
 
 func get_file_name(_file_name: String, file_id: int) -> String:
 	if _file_name == "": return "File %d" % [file_id]
