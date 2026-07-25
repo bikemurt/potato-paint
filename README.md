@@ -17,6 +17,7 @@ Grab the builds from here: https://michaeljared.itch.io/potato-paint
 - Optimized C++ paint brush code (made with GDextension)
 - Saving/loading projects
 - Bucket fill
+- Pen pressure (in theory, never tested)
 
 ## Emoji Legend
 - ↩️ Undo
