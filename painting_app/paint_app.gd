@@ -103,6 +103,8 @@ var file_name := ""
 var layer_count := 0
 var last_saved_tween: Tween
 var file_dialog := FileDialog.new()
+var autosave := false
+var autosave_timer := 10.0
 
 func _ready() -> void:
 	load_save_data()
@@ -136,11 +138,20 @@ func _ready() -> void:
 	else:
 		load_save_file()
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	if texture_dirty:
 		var active_data := get_active_data()
 		active_data.image_texture.update(active_data.image)
 		texture_dirty = false
+	
+	if autosave and autosave_timer >= 5.0:
+		save()
+		autosave_timer = 0.0
+		autosave = false
+	
+	# prevent it from creeping up infinitely?
+	if autosave_timer <= 10.0:
+		autosave_timer += delta
 
 func get_file_name(_file_name: String, file_id: int) -> String:
 	if _file_name == "": return "File %d" % [file_id]
@@ -342,10 +353,9 @@ func gui_input(event: InputEvent) -> void:
 				set_eye_dropper_color(pos)
 				eye_dropper = false
 			else:
-				
-				save_undo_state()
 				#draw_brush_stamp2(pos, data.image, data.brush_size, brush_mask,
 				#	data.brush_color, eraser, brush_pressure)
+				save_undo_state()
 				PaintUtils.draw_brush_stamp(pos, data.image, data.brush_size, brush_mask,
 					data.brush_color, eraser, brush_pressure)
 				
@@ -353,6 +363,7 @@ func gui_input(event: InputEvent) -> void:
 				
 				last_stamp_pos = pos
 				drawing = true
+				autosave = true
 		else:
 			drawing = false
 	
@@ -363,6 +374,7 @@ func gui_input(event: InputEvent) -> void:
 			brush_pressure = event.pressure
 		
 		draw_stroke(pos)
+		autosave = true
 
 func set_eye_dropper_color(pos: Vector2) -> void:
 	var order := get_layer_order()
@@ -374,16 +386,6 @@ func set_eye_dropper_color(pos: Vector2) -> void:
 		dst = dst.blend(src)
 	
 	set_color(dst)
-
-func _on_control_gui_input(event: InputEvent) -> void:
-	if not ui.visible and event is InputEventScreenTouch or event is InputEventMouseButton:
-		top_left_corner.hide()
-		full_draw_region.hide()
-		ui.show()
-		if disabled:
-			disabled = true
-			await get_tree().create_timer(0.3).timeout
-			disabled = false
 
 func draw_stroke(to: Vector2) -> void:
 	var data := get_active_data()
@@ -574,6 +576,16 @@ func update_size() -> void:
 
 
 
+func _on_control_gui_input(event: InputEvent) -> void:
+	if not ui.visible and event is InputEventScreenTouch or event is InputEventMouseButton:
+		top_left_corner.hide()
+		full_draw_region.hide()
+		ui.show()
+		if disabled:
+			disabled = true
+			await get_tree().create_timer(0.3).timeout
+			disabled = false
+
 func _on_new_layer_pressed() -> void:
 	var b := create_layer()
 	layer_button_pressed(b)
@@ -598,6 +610,7 @@ func _on_fill_button_pressed() -> void:
 	var data := get_active_data()
 	data.image.fill(data.brush_color)
 	texture_dirty = true
+	autosave = true
 
 func _on_set_eraser_button_pressed() -> void:
 	eraser = not eraser
@@ -608,6 +621,7 @@ func _on_fill_empty_button_pressed() -> void:
 	save_undo_state()
 	get_active_data().image.fill(Color.TRANSPARENT)
 	texture_dirty = true
+	autosave = true
 
 func _on_tool_button_pressed() -> void:
 	tool_box.visible = not tool_box.visible
