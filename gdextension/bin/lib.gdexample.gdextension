@@ -1,0 +1,13 @@
+[configuration]
+
+entry_symbol = "example_library_init"
+compatibility_minimum = "4.1"
+reloadable = true
+
+[libraries]
+
+windows.release.x86_64 = "./lib.gdexample.windows.template_release.x86_64.dll"
+windows.debug.x86_64 = "./lib.gdexample.windows.template_debug.x86_64.dll"
+android.release.arm64 = "./lib.gdexample.android.template_release.arm64.so"
+web.wasm32.template_release = "lib.gdexample.web.template_release.wasm32.wasm"
+web.wasm32.template_debug = "lib.gdexample.web.template_debug.wasm32.wasm"

@@ -1,0 +1,18 @@
+[gd_resource type="Theme" format=3 uid="uid://bbsgkpjd6emgf"]
+
+[ext_resource type="StyleBox" uid="uid://5ckvk7bus8m4" path="res://themes/button_stylebox.tres" id="1_6qegq"]
+[ext_resource type="FontFile" uid="uid://c7aygx5fy0nal" path="res://fonts/Inter-VariableFont_opsz,wght.ttf" id="2_hjn8r"]
+
+[resource]
+default_font = ExtResource("2_hjn8r")
+default_font_size = 24
+Button/styles/normal = ExtResource("1_6qegq")
+HBoxContainer/constants/separation = 20
+Label/constants/outline_size = 6
+MarginContainer/constants/margin_bottom = 80
+MarginContainer/constants/margin_left = 20
+MarginContainer/constants/margin_right = 20
+MarginContainer/constants/margin_top = 80
+OptionButton/styles/normal = ExtResource("1_6qegq")
+SpinBox/constants/buttons_width = 100
+VBoxContainer/constants/separation = 20
