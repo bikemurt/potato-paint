@@ -1,6 +1,8 @@
 # Potato Paint
 Potato Paint is a lightweight, optimized, cross-platform painting application. I made it because I have a tablet (the aforementioned "potato") incapable of running any painting apps fast enough to be useful.
 
+<img width="256" height="256" alt="icon" src="https://github.com/user-attachments/assets/6cb0d09c-da45-4e6b-bbb2-daadab24998d" />
+
 ## Features
 - Cross platform: Windows, Android app, Web, and Linux
 - Layers: adding, deleting, re-ordering
