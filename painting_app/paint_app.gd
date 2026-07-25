@@ -99,10 +99,10 @@ var texture_dirty := false
 var last_stamp_pos := Vector2(-100,-100)
 var disabled := false
 var drag_region_mouse_hover := false
-
 var file_name := ""
 var layer_count := 0
 var last_saved_tween: Tween
+var file_dialog := FileDialog.new()
 
 func _ready() -> void:
 	load_save_data()
@@ -122,6 +122,14 @@ func _ready() -> void:
 	
 	draw_region.gui_input.connect(gui_input)
 	full_draw_region.gui_input.connect(gui_input)
+	
+	add_child(file_dialog)
+
+	file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	file_dialog.access = FileDialog.ACCESS_FILESYSTEM
+	file_dialog.filters = ["*.png ; PNG Images"]
+
+	file_dialog.file_selected.connect(on_file_selected)
 	
 	if save_data.current_file == -1:
 		new_save_file()
@@ -453,7 +461,7 @@ func redo() -> void:
 	data.image_texture.update(data.image)
 
 func rasterize_layers() -> Image:
-	var _size := DisplayServer.screen_get_size()
+	var _size := DisplayServer.window_get_size()
 	
 	var output := Image.create(
 		_size.x,
@@ -464,44 +472,21 @@ func rasterize_layers() -> Image:
 	
 	output.fill(Color.TRANSPARENT)
 	
-	for _layer_id in image_map:
-		var data: ImageData = image_map[_layer_id]
+	var order := get_layer_order()
+	for i in order:
+		var layer_id := order[i]
+		var data: ImageData = image_map[layer_id]
 
 		if not data.texture_rect.visible:
 			continue
 
 		output.blend_rect(
 			data.image,
-			Rect2(Vector2.ZERO, size),
+			Rect2(Vector2.ZERO, _size),
 			Vector2.ZERO
 		)
 	
 	return output
-
-func rebuild_brushx() -> void:
-	var data := get_active_data()
-
-	var _size := data.brush_size
-	var radius := _size * 0.5
-	
-	brush_mask.resize(_size * _size)
-	
-	for y in range(_size):
-		for x in range(_size):
-			var dx := x + 0.5 - radius
-			var dy := y + 0.5 - radius
-			
-			var distance := sqrt(dx * dx + dy * dy)
-		
-			var alpha := 0.0
-			if distance <= radius:
-				var hard_radius := radius * data.brush_hardness
-				if distance <= hard_radius:
-					alpha = 1.0
-				else:
-					alpha = 1.0 - smoothstep(hard_radius, radius, distance)
-			
-			brush_mask[y * _size + x] = alpha
 
 func rebuild_brush() -> void:
 	var data := get_active_data()
@@ -551,6 +536,42 @@ func get_layer_order() -> Array[int]:
 	for layer in layers.get_children():
 		order.push_back(layer.get_meta(&"layer"))
 	return order
+
+func on_file_selected(path: String):
+	var img := rasterize_layers()
+	img.save_png(path)
+
+func move_node(node: Node, inc: int) -> void:
+	var current_index := node.get_index()
+	var ok := inc > 0 or (inc < 0 and current_index > 0)
+	if ok:
+		node.get_parent().move_child(node, current_index + inc)
+
+
+
+
+
+func update_vis_button() -> void:
+	var texture_rect := get_active_data().texture_rect
+	if texture_rect.visible:
+		toggle_layer_visibility.text = "👁"
+	else:
+		toggle_layer_visibility.text = "⛔"
+
+func update_chosen_color() -> void:
+	chosen_color_rect.color = get_active_data().brush_color
+
+func update_hardness() -> void:
+	hardness_h_slider.value = get_active_data().brush_hardness
+
+func update_spacing() -> void:
+	spacing_h_slider.value = get_active_data().brush_spacing
+
+func update_size() -> void:
+	size_h_slider.value = get_active_data().brush_size
+
+
+
 
 
 func _on_new_layer_pressed() -> void:
@@ -632,12 +653,6 @@ func _on_eye_dropper_button_pressed() -> void:
 func _on_size_h_slider_value_changed(value: float) -> void:
 	size_label.text = "%d" % roundi(value)
 
-func move_node(node: Node, inc: int) -> void:
-	var current_index := node.get_index()
-	var ok := inc > 0 or (inc < 0 and current_index > 0)
-	if ok:
-		node.get_parent().move_child(node, current_index + inc)
-
 func _on_left_layer_pressed() -> void:
 	var data := get_active_data()
 	move_node(data.texture_rect, -1)
@@ -698,23 +713,7 @@ func _on_new_file_button_pressed() -> void:
 	new_save_file()
 	load_file.hide()
 
-
-
-func update_vis_button() -> void:
-	var texture_rect := get_active_data().texture_rect
-	if texture_rect.visible:
-		toggle_layer_visibility.text = "👁"
-	else:
-		toggle_layer_visibility.text = "⛔"
-
-func update_chosen_color() -> void:
-	chosen_color_rect.color = get_active_data().brush_color
-
-func update_hardness() -> void:
-	hardness_h_slider.value = get_active_data().brush_hardness
-
-func update_spacing() -> void:
-	spacing_h_slider.value = get_active_data().brush_spacing
-
-func update_size() -> void:
-	size_h_slider.value = get_active_data().brush_size
+func _on_export_button_pressed() -> void:
+	file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	file_dialog.current_file = get_file_name(file_name, save_data.current_file)
+	file_dialog.popup_centered_ratio()

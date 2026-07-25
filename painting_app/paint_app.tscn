@@ -122,11 +122,14 @@ layout_mode = 2
 [node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=1703016836]
 layout_mode = 2
 
-[node name="SetColorButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=819287260]
+[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1761496268]
+layout_mode = 2
+
+[node name="SetColorButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer3" unique_id=819287260]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 
-[node name="ChosenColorRect" type="ColorRect" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/SetColorButton" unique_id=212836680]
+[node name="ChosenColorRect" type="ColorRect" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer3/SetColorButton" unique_id=212836680]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 1
@@ -136,6 +139,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="ToolButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer3" unique_id=905182730]
+layout_mode = 2
+text = "🔨"
+
+[node name="SettingsButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer3" unique_id=1139908337]
+layout_mode = 2
+text = "⚙️"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=700036048]
 layout_mode = 2
@@ -165,21 +176,21 @@ rounded = true
 layout_mode = 2
 text = "🔁"
 
-[node name="ToolButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=905182730]
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=685510165]
 layout_mode = 2
-text = "🔨"
+size_flags_horizontal = 8
 
-[node name="SettingsButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1139908337]
-layout_mode = 2
-text = "⚙️"
-
-[node name="SaveButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1490037506]
+[node name="SaveButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer2" unique_id=1490037506]
 layout_mode = 2
 text = "💾"
 
-[node name="LoadButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=613899628]
+[node name="LoadButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer2" unique_id=613899628]
 layout_mode = 2
 text = "🔍"
+
+[node name="ExportButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer2" unique_id=1704432187]
+layout_mode = 2
+text = "📤"
 
 [node name="ToolBox" type="HBoxContainer" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer" unique_id=1886092616]
 unique_name_in_owner = true
@@ -192,7 +203,7 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
-text = "E"
+text = "🧹"
 
 [node name="HideUIButton" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/ToolBox/HBoxContainer2" unique_id=1165334231]
 unique_name_in_owner = true
@@ -311,7 +322,7 @@ text = "➡️"
 [node name="NewLayer" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer2/HBoxContainer/HBoxContainer" unique_id=1183462590]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
-text = "+"
+text = "➕"
 
 [node name="ToggleLayerVisibility" type="Button" parent="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer2/HBoxContainer/HBoxContainer" unique_id=1968438849]
 unique_name_in_owner = true
@@ -358,6 +369,7 @@ text = "Close"
 
 [node name="LoadFile" type="PanelContainer" parent="CanvasLayer/UIParent/UI" unique_id=914394613]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -479,15 +491,16 @@ layout_mode = 2
 text = "Close"
 
 [connection signal="gui_input" from="CanvasLayer/UIParent/TopLeftCorner" to="." method="_on_control_gui_input"]
-[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/SetColorButton" to="." method="_on_set_color_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer3/SetColorButton" to="." method="_on_set_color_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer3/ToolButton" to="." method="_on_tool_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer3/SettingsButton" to="." method="_on_settings_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer/UndoButton" to="." method="_on_undo_button_pressed"]
 [connection signal="drag_ended" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer/SizeHSlider" to="." method="_on_size_h_slider_drag_ended"]
 [connection signal="value_changed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer/SizeHSlider" to="." method="_on_size_h_slider_value_changed"]
 [connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer/RedoButton" to="." method="_on_redo_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/ToolButton" to="." method="_on_tool_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/SettingsButton" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/SaveButton" to="." method="_on_save_button_pressed"]
-[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer2/SaveButton" to="." method="_on_save_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer2/LoadButton" to="." method="_on_load_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer2/HBoxContainer2/ExportButton" to="." method="_on_export_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/ToolBox/HBoxContainer2/SetEraserButton" to="." method="_on_set_eraser_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/ToolBox/HBoxContainer2/HideUIButton" to="." method="_on_hide_ui_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/ToolBox/HBoxContainer2/EyeDropperButton" to="." method="_on_eye_dropper_button_pressed"]
