@@ -31,3 +31,4 @@ Potato Paint is a lightweight, optimized, cross-platform painting application. I
 - ➕ New layer
 - 👁️ Toggle hide layer
 - ❌ Delete layer
+- 📤 Export rasterized image (this has a lot of limitations currently)
