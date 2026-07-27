@@ -373,6 +373,7 @@ text = "❌"
 
 [node name="SelectColor" type="PanelContainer" parent="UICanvas/UIParent/UI" unique_id=2049890018]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

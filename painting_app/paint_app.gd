@@ -2,6 +2,8 @@ extends Control
 
 const MAX_UNDO := 20
 const SAVE_PATH := "user://data.save"
+const MIN_ZOOM := 0.01
+const MAX_ZOOM := 1000.0
 
 @onready var layers: Control = %Layers
 @onready var layer_buttons: HBoxContainer = %LayerButtons
@@ -100,7 +102,15 @@ var autosave := false
 var autosave_timer := 10.0
 var drawing_timer := 0.0
 
-var zoom := 1.0
+var zoom := 1.0:
+	get:
+		return zoom
+	set(value):
+		if value > 5.0:
+			layer_control.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		else:
+			layer_control.texture_filter = CanvasItem.TEXTURE_FILTER_PARENT_NODE
+		zoom = value
 var touches: Dictionary[int, Vector2] = {}
 var pinch_start_distance := 0.0
 var pinch_start_zoom := 1.0
@@ -206,7 +216,7 @@ func zoom_at_mouse(factor: float) -> void:
 
 func zoom_at_point(factor: float, point: Vector2) -> void:
 	var old_zoom := zoom
-	zoom = clamp(zoom * factor, 0.25, 8.0)
+	zoom = clamp(zoom * factor, MIN_ZOOM, MAX_ZOOM)
 	
 	factor = zoom / old_zoom
 	
