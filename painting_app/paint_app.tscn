@@ -50,21 +50,13 @@ grow_vertical = 2
 
 [node name="LayerControl" type="Control" parent="LayerCanvas/ContentScaleControl" unique_id=633654003]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
 
 [node name="BGTextureRect" type="TextureRect" parent="LayerCanvas/ContentScaleControl/LayerControl" unique_id=1612137410]
 unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 0
+offset_right = 50.0
+offset_bottom = 50.0
 texture = ExtResource("2_2h5ql")
 stretch_mode = 1
 

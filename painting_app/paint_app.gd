@@ -235,6 +235,7 @@ func new_save_file() -> void:
 	_on_new_layer_pressed()
 	save_data.current_file = save_data.file_count
 	save_data.file_count += 1
+	_on_reset_zoom_button_pressed()
 
 func reset_all_data() -> void:
 	for c in layers.get_children(): c.free()
@@ -367,6 +368,8 @@ func load_save_file() -> void:
 		canvas_size = save_file_data.canvas_size
 	
 	layer_button_pressed(active_layer_button)
+	
+	_on_reset_zoom_button_pressed()
 
 func get_active_data() -> ImageData:
 	return image_map[active_layer]
@@ -458,6 +461,10 @@ func handle_touch(event: InputEventScreenTouch) -> void:
 		if touches.size() == 2:
 			drawing = false
 			start_pinch()
+		
+		if touches.size() == 3:
+			drawing = false
+			start_pinch_move()
 	
 	else:
 		touches.erase(event.index)
@@ -470,6 +477,10 @@ func handle_drag(event: InputEventScreenDrag, texture_rect: Control) -> void:
 	
 	if touches.size() == 2:
 		handle_pinch()
+		return
+	
+	if touches.size() == 3:
+		handle_pinch_move()
 		return
 
 	if drawing:
@@ -528,6 +539,19 @@ func handle_pinch() -> void:
 		pinch_start_zoom * factor / zoom,
 		center
 	)
+
+var pinch_move_last_center  := Vector2.ZERO
+func start_pinch_move() -> void:
+	var points := touches.values()
+	pinch_move_last_center = (points[0] + points[1] + points[2]) / 3.0
+
+func handle_pinch_move() -> void:
+	var points := touches.values()
+	var center: Vector2 = (points[0] + points[1] + points[2]) / 3.0
+	
+	var delta := center - pinch_move_last_center 
+	layer_control.position += delta
+	pinch_move_last_center = center
 
 func set_eye_dropper_color(pos: Vector2) -> void:
 	var order := get_layer_order()
@@ -813,7 +837,7 @@ func _on_draw_region_mouse_entered() -> void:
 func _on_draw_region_mouse_exited() -> void:
 	drag_region_mouse_hover = false
 
-func _on_eye_dropper_button_pressed() -> void:
+func _on_eye_dropper_button_pressed() -> void:	
 	eye_dropper = true
 
 func _on_size_h_slider_value_changed(value: float) -> void:
@@ -887,4 +911,6 @@ func _on_export_button_pressed() -> void:
 func _on_reset_zoom_button_pressed() -> void:
 	zoom = 1.0
 	layer_control.scale = Vector2.ONE
-	layer_control.position = Vector2.ZERO
+	var viewport := Vector2(get_tree().root.size)
+	var canvas := Vector2(canvas_size)
+	layer_control.global_position = Vector2(viewport - canvas) * 0.5 / get_tree().root.content_scale_factor
