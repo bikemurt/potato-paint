@@ -3,10 +3,26 @@
 [ext_resource type="StyleBox" uid="uid://5ckvk7bus8m4" path="res://themes/button_stylebox.tres" id="1_6qegq"]
 [ext_resource type="FontFile" uid="uid://c7aygx5fy0nal" path="res://fonts/Inter-VariableFont_opsz,wght.ttf" id="2_hjn8r"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p0ucp"]
+bg_color = Color(0.4559096, 0.63278985, 0.6906894, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_balt5"]
+bg_color = Color(0.45490196, 0.6313726, 0.6901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ikh11"]
+bg_color = Color(0.45490196, 0.6313726, 0.6901961, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f7v51"]
+bg_color = Color(0.45490196, 0.6313726, 0.6901961, 1)
+
 [resource]
 default_font = ExtResource("2_hjn8r")
 default_font_size = 24
+Button/styles/focus = SubResource("StyleBoxFlat_p0ucp")
+Button/styles/hover = SubResource("StyleBoxFlat_balt5")
+Button/styles/hover_pressed = SubResource("StyleBoxFlat_ikh11")
 Button/styles/normal = ExtResource("1_6qegq")
+Button/styles/pressed = SubResource("StyleBoxFlat_f7v51")
 HBoxContainer/constants/separation = 20
 Label/constants/outline_size = 6
 MarginContainer/constants/margin_bottom = 80

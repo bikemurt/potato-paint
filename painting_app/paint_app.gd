@@ -30,11 +30,15 @@ const SAVE_PATH := "user://data.save"
 @onready var layer_control: Control = %LayerControl
 @onready var bg_texture_rect: TextureRect = %BGTextureRect
 @onready var content_scale_control: Control = %ContentScaleControl
+@onready var x_size_spin_box: SpinBox = %XSizeSpinBox
+@onready var y_size_spin_box: SpinBox = %YSizeSpinBox
+@onready var eye_dropper_button: Button = %EyeDropperButton
 
 var save_data := {
 	&"file_count": 0,
 	&"current_file": -1,
-	&"files": {}
+	&"files": {},
+	&"version": 100
 }
 
 class ImageData:
@@ -62,6 +66,7 @@ var eye_dropper := false:
 		return eye_dropper
 	set(value):
 		set_cursor(value, Control.CURSOR_CROSS, Control.CURSOR_POINTING_HAND)
+		eye_dropper_button.button_pressed = value
 		eye_dropper = value
 
 var active_layer := 0:
@@ -102,6 +107,8 @@ var pinch_start_zoom := 1.0
 var pinch_active := false
 var last_window_size := Vector2i.ZERO
 
+var canvas_size := Vector2i.ZERO
+
 func _ready() -> void:
 	load_save_data()
 	
@@ -128,6 +135,9 @@ func _ready() -> void:
 	file_dialog.filters = ["*.png ; PNG Images"]
 
 	file_dialog.file_selected.connect(on_file_selected)
+	
+	x_size_spin_box.value = DisplayServer.window_get_size().x
+	y_size_spin_box.value = DisplayServer.window_get_size().y
 	
 	if save_data.current_file == -1:
 		new_save_file()
@@ -211,6 +221,7 @@ func get_file_name(_file_name: String, file_id: int) -> String:
 
 func new_save_file() -> void:
 	reset_all_data()
+	canvas_size = Vector2i(roundi(x_size_spin_box.value), roundi(y_size_spin_box.value))
 	_on_new_layer_pressed()
 	save_data.current_file = save_data.file_count
 	save_data.file_count += 1
@@ -235,6 +246,7 @@ func reset_all_data() -> void:
 	last_stamp_pos = Vector2(-100,-100)
 	disabled = false
 	drag_region_mouse_hover = false
+	canvas_size = Vector2i.ZERO
 
 func delete_layer_folder(path: String) -> void:
 	var dir := DirAccess.open(path)
@@ -252,7 +264,8 @@ func save() -> void:
 		&"layer_order": get_layer_order(),
 		&"active_layer": active_layer,
 		&"file_name": file_name,
-		&"layers": {}
+		&"layers": {},
+		&"canvas_size": canvas_size,
 	}
 	var dir := "user://saves/save_%d" % save_data.current_file
 	DirAccess.make_dir_recursive_absolute(dir)
@@ -338,6 +351,11 @@ func load_save_file() -> void:
 	layer_count = save_file_data.layer_count
 	file_name = save_file_data.file_name
 	
+	if &"canvas_size" not in save_file_data:
+		canvas_size = DisplayServer.window_get_size()
+	else:
+		canvas_size = save_file_data.canvas_size
+	
 	layer_button_pressed(active_layer_button)
 
 func get_active_data() -> ImageData:
@@ -346,7 +364,7 @@ func get_active_data() -> ImageData:
 func create_layer() -> Button:
 	var data := ImageData.new()
 	
-	var res := DisplayServer.window_get_size()
+	var res := canvas_size
 	data.image = Image.create(res.x, res.y, false, Image.FORMAT_RGBA8)
 	data.image.fill(Color.TRANSPARENT)
 	
@@ -387,57 +405,6 @@ func layer_button_pressed(b: Button) -> void:
 	var layer: int = b.get_meta(&"layer")
 	b.text = str(layer + 1) + "*"
 	active_layer = layer
-
-func gui_inputX(event: InputEvent) -> void:
-	var texture_rect := get_active_data().texture_rect
-	if not texture_rect.visible: return
-	if select_color.visible: return
-	if disabled: return
-	if ui.visible and not drag_region_mouse_hover:
-		drawing = false
-		return
-	
-	var data := get_active_data()
-	var is_mouse_button := event is InputEventMouseButton
-	
-	if event is InputEventMagnifyGesture:
-		zoom_at_point(event.factor, event.position)
-		return
-	
-	if event is InputEventScreenTouch or is_mouse_button:
-		var valid_mouse_button := true
-		if is_mouse_button and event.button_index != 1: valid_mouse_button = false
-		 
-		if event.pressed and valid_mouse_button:
-			var pos := screen_to_canvas(texture_rect)
-			if eye_dropper:
-				set_eye_dropper_color(pos)
-				eye_dropper = false
-			else:
-				# save undo state prior to placing the first stamp
-				save_undo_state()
-				
-				#draw_brush_stamp2(pos, data.image, data.brush_size, brush_mask,
-				#	data.brush_color, eraser, brush_pressure)
-				PaintUtils.draw_brush_stamp(pos, data.image, data.brush_size, brush_mask,
-					data.brush_color, eraser, brush_pressure)
-				
-				texture_dirty = true
-				
-				last_stamp_pos = pos
-				drawing = true
-				autosave = true
-		else:
-			drawing = false
-	
-	elif (event is InputEventScreenDrag or event is InputEventMouseMotion) and drawing:
-		var pos := screen_to_canvas(texture_rect)
-		
-		if event is InputEventScreenDrag:
-			brush_pressure = event.pressure
-		
-		draw_stroke(pos)
-		autosave = true
 
 func gui_input(event: InputEvent) -> void:
 	var texture_rect := get_active_data().texture_rect
@@ -556,7 +523,7 @@ func set_eye_dropper_color(pos: Vector2) -> void:
 	var order := get_layer_order()
 	var layer_0 := image_map[order[0]].image
 	var dst := layer_0.get_pixelv(pos)
-	for i in order:
+	for i in len(order):
 		if i == 0: continue
 		var src := image_map[order[i]].image.get_pixelv(pos)
 		dst = dst.blend(src)
@@ -643,11 +610,9 @@ func redo() -> void:
 	autosave = true
 
 func rasterize_layers() -> Image:
-	var _size := DisplayServer.window_get_size()
-	
 	var output := Image.create(
-		_size.x,
-		_size.y,
+		canvas_size.x,
+		canvas_size.y,
 		false,
 		Image.FORMAT_RGBA8
 	)
@@ -655,16 +620,15 @@ func rasterize_layers() -> Image:
 	output.fill(Color.TRANSPARENT)
 	
 	var order := get_layer_order()
-	for i in order:
-		var layer_id := order[i]
-		var data: ImageData = image_map[layer_id]
+	for i in len(order):
+		var data: ImageData = image_map[order[i]]
 
 		if not data.texture_rect.visible:
 			continue
 
 		output.blend_rect(
 			data.image,
-			Rect2(Vector2.ZERO, _size),
+			Rect2(Vector2.ZERO, canvas_size),
 			Vector2.ZERO
 		)
 	
@@ -859,7 +823,7 @@ func _on_delete_layer_pressed() -> void:
 	if len(image_map) > 1:
 		var order := get_layer_order()
 		var new_active_layer := order[1]
-		for i in get_layer_order():
+		for i in order:
 			if i == active_layer: break
 			new_active_layer = i
 		

@@ -42,9 +42,11 @@ unique_name_in_owner = true
 [node name="ContentScaleControl" type="Control" parent="LayerCanvas" unique_id=1529864087]
 unique_name_in_owner = true
 layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="LayerControl" type="Control" parent="LayerCanvas/ContentScaleControl" unique_id=633654003]
 unique_name_in_owner = true
@@ -229,6 +231,7 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
+toggle_mode = true
 text = "🧹"
 
 [node name="HideUIButton" type="Button" parent="UICanvas/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/ToolBox/HBoxContainer2" unique_id=1165334231]
@@ -241,6 +244,7 @@ text = "👀"
 unique_name_in_owner = true
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
+toggle_mode = true
 text = "🖌️"
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="UICanvas/UIParent/UI/MarginContainer/VBoxContainer/MarginContainer/VBoxContainer/ToolBox" unique_id=1188109944]
@@ -369,7 +373,6 @@ text = "❌"
 
 [node name="SelectColor" type="PanelContainer" parent="UICanvas/UIParent/UI" unique_id=2049890018]
 unique_name_in_owner = true
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -382,7 +385,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_csr3e")
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="UICanvas/UIParent/UI/SelectColor/MarginContainer" unique_id=946895007]
-custom_minimum_size = Vector2(600, 500)
+custom_minimum_size = Vector2(700, 500)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
@@ -428,13 +431,33 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 
+[node name="DeleteButton" type="Button" parent="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer" unique_id=394842253]
+layout_mode = 2
+text = "❌ Delete Current File"
+
 [node name="HBoxContainer2" type="HBoxContainer" parent="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer" unique_id=1531223466]
 layout_mode = 2
 size_flags_horizontal = 4
 
-[node name="DeleteButton" type="Button" parent="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=394842253]
+[node name="XSizeSpinBox" type="SpinBox" parent="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1350004219]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-text = "❌ Delete Current File"
+min_value = 1.0
+value = 1.0
+rounded = true
+allow_greater = true
+select_all_on_focus = true
+
+[node name="YSizeSpinBox" type="SpinBox" parent="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=2026575108]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+min_value = 1.0
+value = 1.0
+rounded = true
+allow_greater = true
+select_all_on_focus = true
 
 [node name="NewFileButton" type="Button" parent="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2" unique_id=1124190904]
 layout_mode = 2
@@ -550,6 +573,6 @@ text = "Close"
 [connection signal="color_changed" from="UICanvas/UIParent/UI/SelectColor/MarginContainer/VBoxContainer/ColorPicker" to="." method="_on_color_picker_color_changed"]
 [connection signal="pressed" from="UICanvas/UIParent/UI/SelectColor/MarginContainer/VBoxContainer/ColorCloseButton" to="." method="_on_color_close_button_pressed"]
 [connection signal="text_changed" from="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer/FileNameLineEdit" to="." method="_on_file_name_line_edit_text_changed"]
-[connection signal="pressed" from="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2/DeleteButton" to="." method="_on_delete_button_pressed"]
+[connection signal="pressed" from="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer/DeleteButton" to="." method="_on_delete_button_pressed"]
 [connection signal="pressed" from="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/HBoxContainer2/NewFileButton" to="." method="_on_new_file_button_pressed"]
 [connection signal="pressed" from="UICanvas/UIParent/UI/LoadFile/MarginContainer/VBoxContainer/LoadFileCloseButton" to="." method="_on_load_file_close_button_pressed"]
