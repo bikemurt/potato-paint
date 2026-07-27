@@ -26,28 +26,15 @@ const SAVE_PATH := "user://data.save"
 @onready var load_v_box_container: VBoxContainer = %LoadVBoxContainer
 @onready var file_name_line_edit: LineEdit = %FileNameLineEdit
 @onready var last_saved_label: Label = %LastSavedLabel
+@onready var layer_canvas: CanvasLayer = %LayerCanvas
+@onready var layer_control: Control = %LayerControl
+@onready var bg_texture_rect: TextureRect = %BGTextureRect
+@onready var content_scale_control: Control = %ContentScaleControl
 
 var save_data := {
 	&"file_count": 0,
 	&"current_file": -1,
-	&"files": {
-		#0: {
-			#&"layer_id": 0,
-			#&"layer_order": [0,1],
-			#&"layers": {
-				#0: {
-					## image path gen from keys. user://saves/save_0/layer_0.png
-					#&"brush_size": 10,
-					#&"brush_color_r": 1.0,
-					#&"brush_color_g": 0.0,
-					#&"brush_color_b": 0.0,
-					#&"brush_color_a": 1.0,
-					#&"brush_hardness": 0.5,
-					#&"brush_spacing": 0.1,
-				#},
-			#}
-		#}
-	}
+	&"files": {}
 }
 
 class ImageData:
@@ -103,8 +90,17 @@ var file_name := ""
 var layer_count := 0
 var last_saved_tween: Tween
 var file_dialog := FileDialog.new()
+
 var autosave := false
 var autosave_timer := 10.0
+var drawing_timer := 0.0
+
+var zoom := 1.0
+var touches: Dictionary[int, Vector2] = {}
+var pinch_start_distance := 0.0
+var pinch_start_zoom := 1.0
+var pinch_active := false
+var last_window_size := Vector2i.ZERO
 
 func _ready() -> void:
 	load_save_data()
@@ -144,7 +140,8 @@ func _process(delta: float) -> void:
 		active_data.image_texture.update(active_data.image)
 		texture_dirty = false
 	
-	if autosave and autosave_timer >= 5.0:
+	# never save while drawing to prevent hitching
+	if autosave and autosave_timer >= 5.0 and not drawing and drawing_timer >= 2.0 and not pinch_active:
 		save()
 		autosave_timer = 0.0
 		autosave = false
@@ -152,6 +149,61 @@ func _process(delta: float) -> void:
 	# prevent it from creeping up infinitely?
 	if autosave_timer <= 10.0:
 		autosave_timer += delta
+	
+	if not drawing and drawing_timer <= 10.0:
+		drawing_timer += delta
+	
+	if drawing:
+		drawing_timer = 0.0
+	
+	if DisplayServer.window_get_size() != last_window_size:
+		var wsize := DisplayServer.window_get_size()
+		var target_scale := 1.0
+		if wsize.x > 3600: target_scale = 2.0
+		elif wsize.x > 1950: target_scale = 1.2
+		elif wsize.x > 1100: target_scale = 1.0
+		else: target_scale = 0.8
+		
+		if not is_equal_approx(get_tree().root.content_scale_factor, target_scale):
+			get_tree().root.content_scale_factor = target_scale
+			content_scale_control.scale = Vector2.ONE / target_scale
+		
+		last_window_size = DisplayServer.window_get_size()
+	
+	if len(image_map) > 0:
+		bg_texture_rect.size = get_active_data().image.get_size()
+
+var panning := false
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			zoom_at_mouse(1.03)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			zoom_at_mouse(1.0 / 1.03)
+		elif event.button_index == MOUSE_BUTTON_RIGHT:
+			panning = event.pressed
+			return
+	
+	if panning and event is InputEventMouseMotion:
+		layer_control.position += event.relative
+
+func zoom_at_mouse(factor: float) -> void:
+	var _draw_region := draw_region
+	if not draw_region.visible: _draw_region = full_draw_region
+	
+	var point := draw_region.get_local_mouse_position()
+	zoom_at_point(factor, point)
+
+func zoom_at_point(factor: float, point: Vector2) -> void:
+	var old_zoom := zoom
+	zoom = clamp(zoom * factor, 0.25, 8.0)
+	
+	factor = zoom / old_zoom
+	
+	var before := (point - layer_control.position) / old_zoom
+	
+	layer_control.scale = Vector2.ONE * zoom
+	layer_control.position = point - before * zoom
 
 func get_file_name(_file_name: String, file_id: int) -> String:
 	if _file_name == "": return "File %d" % [file_id]
@@ -336,7 +388,7 @@ func layer_button_pressed(b: Button) -> void:
 	b.text = str(layer + 1) + "*"
 	active_layer = layer
 
-func gui_input(event: InputEvent) -> void:
+func gui_inputX(event: InputEvent) -> void:
 	var texture_rect := get_active_data().texture_rect
 	if not texture_rect.visible: return
 	if select_color.visible: return
@@ -346,16 +398,27 @@ func gui_input(event: InputEvent) -> void:
 		return
 	
 	var data := get_active_data()
-	if event is InputEventScreenTouch or event is InputEventMouseButton:
-		if event.pressed:
+	var is_mouse_button := event is InputEventMouseButton
+	
+	if event is InputEventMagnifyGesture:
+		zoom_at_point(event.factor, event.position)
+		return
+	
+	if event is InputEventScreenTouch or is_mouse_button:
+		var valid_mouse_button := true
+		if is_mouse_button and event.button_index != 1: valid_mouse_button = false
+		 
+		if event.pressed and valid_mouse_button:
 			var pos := screen_to_canvas(texture_rect)
 			if eye_dropper:
 				set_eye_dropper_color(pos)
 				eye_dropper = false
 			else:
+				# save undo state prior to placing the first stamp
+				save_undo_state()
+				
 				#draw_brush_stamp2(pos, data.image, data.brush_size, brush_mask,
 				#	data.brush_color, eraser, brush_pressure)
-				save_undo_state()
 				PaintUtils.draw_brush_stamp(pos, data.image, data.brush_size, brush_mask,
 					data.brush_color, eraser, brush_pressure)
 				
@@ -375,6 +438,119 @@ func gui_input(event: InputEvent) -> void:
 		
 		draw_stroke(pos)
 		autosave = true
+
+func gui_input(event: InputEvent) -> void:
+	var texture_rect := get_active_data().texture_rect
+	
+	if not texture_rect.visible: return
+	if select_color.visible: return
+	if disabled: return
+	
+	if event is InputEventScreenTouch:
+		handle_touch(event)
+		return
+	
+	if event is InputEventScreenDrag:
+		handle_drag(event, texture_rect)
+		return
+	
+	var is_mouse_button := event is InputEventMouseButton
+
+	if event is InputEventMagnifyGesture:
+		zoom_at_point(event.factor, event.position)
+		return
+
+	if is_mouse_button:
+		if event.button_index != MOUSE_BUTTON_LEFT:
+			return
+		
+		if event.pressed:
+			start_brush(texture_rect)
+		else:
+			drawing = false
+
+	elif event is InputEventMouseMotion and drawing:
+		var pos := screen_to_canvas(texture_rect)
+		draw_stroke(pos)
+		autosave = true
+
+func handle_touch(event: InputEventScreenTouch) -> void:
+	if event.pressed:
+		touches[event.index] = event.position
+		
+		if touches.size() == 2:
+			drawing = false
+			start_pinch()
+	
+	else:
+		touches.erase(event.index)
+
+		if touches.size() < 2:
+			pinch_active = false
+
+func handle_drag(event: InputEventScreenDrag, texture_rect: Control) -> void:
+	touches[event.index] = event.position
+	
+	if touches.size() == 2:
+		handle_pinch()
+		return
+
+	if drawing:
+		var pos := screen_to_canvas(texture_rect)
+		
+		brush_pressure = event.pressure
+		draw_stroke(pos)
+		autosave = true
+
+func start_brush(texture_rect: Control) -> void:
+	var data := get_active_data()
+	var pos := screen_to_canvas(texture_rect)
+
+	if eye_dropper:
+		set_eye_dropper_color(pos)
+		eye_dropper = false
+		return
+
+	save_undo_state()
+
+	PaintUtils.draw_brush_stamp(
+		pos,
+		data.image,
+		data.brush_size,
+		brush_mask,
+		data.brush_color,
+		eraser,
+		brush_pressure
+	)
+
+	texture_dirty = true
+	last_stamp_pos = pos
+	drawing = true
+	autosave = true
+
+func start_pinch() -> void:
+	undo()
+	undo_stack.pop_back()
+	redo_stack.clear()
+	
+	var points := touches.values()
+
+	pinch_start_distance = points[0].distance_to(points[1])
+	pinch_start_zoom = zoom
+	pinch_active = true
+
+func handle_pinch() -> void:
+	var points := touches.values()
+	
+	var distance: float = points[0].distance_to(points[1])
+	var center: Vector2 = (points[0] + points[1]) * 0.5
+	
+	var factor := distance / pinch_start_distance
+	
+	zoom_at_point(
+		pinch_start_zoom * factor / zoom,
+		center
+	)
 
 func set_eye_dropper_color(pos: Vector2) -> void:
 	var order := get_layer_order()
@@ -454,6 +630,8 @@ func undo() -> void:
 	redo_stack.push_back(data.image.duplicate())
 	data.image = undo_stack.pop_back()
 	data.image_texture.update(data.image)
+	
+	autosave = true
 
 func redo() -> void:
 	var data := get_active_data()
@@ -461,6 +639,8 @@ func redo() -> void:
 	undo_stack.push_back(data.image.duplicate())
 	data.image = redo_stack.pop_back()
 	data.image_texture.update(data.image)
+	
+	autosave = true
 
 func rasterize_layers() -> Image:
 	var _size := DisplayServer.window_get_size()
@@ -729,3 +909,8 @@ func _on_export_button_pressed() -> void:
 	file_dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	file_dialog.current_file = get_file_name(file_name, save_data.current_file)
 	file_dialog.popup_centered_ratio()
+
+func _on_reset_zoom_button_pressed() -> void:
+	zoom = 1.0
+	layer_control.scale = Vector2.ONE
+	layer_control.position = Vector2.ZERO
